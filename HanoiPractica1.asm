@@ -1,30 +1,30 @@
-.eqv Disk 5 # Número de discos
+.eqv Disk 3 # Nï¿½mero de discos
 
 .text
 
 main:
-  addi s0, zero, Disk # Limite para el for por el número de discos
+  addi s0, zero, Disk # Limite para el for por el nï¿½mero de discos
   
-  lui s1, 0x10010 # Dirección de inicio de la torre origen
-  
-  addi t0, zero, Disk # Número de discos a 3 para el for de inicialización
-  addi s2, s1, 4 # Dirección de inicio de la torre auxiliar
-  addi s3, s2, 4 # Dirección de inicio de la torre destino
+  lui s1, 0x10010 # Direcciï¿½n de inicio de la torre origen
+  addi s5, zero, Disk
+  addi t0, zero, Disk # Nï¿½mero de discos a 3 para el for de inicializaciï¿½n
+  addi s2, s1, 4 # Direcciï¿½n de inicio de la torre auxiliar
+  addi s3, s2, 4 # Direcciï¿½n de inicio de la torre destino
 
   # Inicializar la torre origen con los valores de los discos
-  addi t0, zero, Disk # Número de discos para el for de inicialización
+  addi t0, zero, Disk # Nï¿½mero de discos para el for de inicializaciï¿½n
 for:
-  sw t0, 0(s1) # Almacena el valor del disco en la dirección de memoria
+  sw t0, 0(s1) # Almacena el valor del disco en la direcciï¿½n de memoria
   addi s1, s1, 32 # Mueve al siguiente espacio de memoria
   addi t0, t0, -1 # Disminuye el valor del disco
-  bne t0, zero, for # Repite hasta que todos los discos estén en la torre origen
+  bne t0, zero, for # Repite hasta que todos los discos estï¿½n en la torre origen
 
   jal towerOfHanoi
   jal endcode
 
 towerOfHanoi:
-  addi t0, zero, 1 # t0 para la comparación para el caso base a 1
-  beq s0, t0, case_base # Si el número de discos es 1, salta al caso base
+  addi t0, zero, 1 # t0 para la comparaciï¿½n para el caso base a 1
+  beq s0, t0, case_base # Si el nï¿½mero de discos es 1, salta al caso base
 
   # Guardar en el stack -> ra, s0, s1, s2, s3
   addi sp, sp, -4
@@ -39,8 +39,8 @@ towerOfHanoi:
   sw s3, 0(sp)
 
   # Mover N-1 discos de la torre origen a la torre auxiliar
-  addi s0, s0, -1 # Disminuye el número de discos
-  add s4, s2, zero # Guarda temporalmente la dirección de la torre auxiliar
+  addi s0, s0, -1 # Disminuye el nï¿½mero de discos
+  add s4, s2, zero # Guarda temporalmente la direcciï¿½n de la torre auxiliar
   add s2, s3, zero # swap: torre auxiliar a la torre destino
   add s3, s4, zero # swap: torre destino a la torre auxiliar
   jal towerOfHanoi # Llamada recursiva
@@ -58,7 +58,7 @@ towerOfHanoi:
   addi sp, sp, 4
 
   jal mov
-
+endmov:
   # Recuperar del stack -> ra, s0, s1, s2, s3
   addi sp, sp, -4
   sw ra, 16(sp)
@@ -72,8 +72,8 @@ towerOfHanoi:
   sw s3, 0(sp)
 
   # Mover N-1 discos de la torre auxiliar a la torre destino
-  addi s0, s0, -1 # Disminuye el número de discos
-  add s4, s1, zero # Guarda temporalmente la dirección de la torre origen
+  addi s0, s0, -1 # Disminuye el nï¿½mero de discos
+  add s4, s1, zero # Guarda temporalmente la direcciï¿½n de la torre origen
   add s1, s3, zero # swap: torre origen a la torre destino
   add s3, s4, zero # swap: torre destino a la torre origen
   jal towerOfHanoi # Llamada recursiva
@@ -103,10 +103,10 @@ case_base:
 
 count_zeros:
   addi a3, zero, 0   # Inicializar el contador de ceros en a3
-  addi t0, s1, 0     # Copiar la dirección de inicio de la torre de origen a t0
+  addi t0, s1, 0     # Copiar la direcciï¿½n de inicio de la torre de origen a t0
 
 count_zeros_loop:
-  lw t1, 0(t0)       # Cargar el valor en la dirección t0
+  lw t1, 0(t0)       # Cargar el valor en la direcciï¿½n t0
   beqz t1, increment # Si el valor es cero, incrementar el contador de ceros
   addi t0, t0, 32    # Si no es cero, pasar al siguiente valor en la torre
   jal zero count_zeros_loop # Repetir el bucle
@@ -122,17 +122,18 @@ increment:
 
 count_disk:
    sub a4, s0, a3
-   jalr ra
+   jal zero, endcount
 
 mov:
-    jal count_disk  # Llama a la función count_disk para contar los discos
-    sub t0, s0, a4    # Resta el número de discos restantes (s0) y el número de discos en la torre origen (a4), y guarda el resultado en t0
+    jal count_disk  # Llama a la funciï¿½n count_disk para contar los discos
+endcount:
+    sub t0, s5, a4    # Resta el nï¿½mero de discos restantes (s0) y el nï¿½mero de discos en la torre origen (a4), y guarda el resultado en t0
     slli t0, t0, 5   # Desplaza a la izquierda el valor en t0 por 5 bits (multiplica por 32), para obtener el desplazamiento en bytes
     add t0, s1, t0   # Suma el desplazamiento al inicio de la torre origen (s1), y guarda el resultado en t0
-    lw t1, 0(t0)   # Carga el valor del disco en la dirección calculada (t0), y guarda el valor en t1
-    sw zero, 0(t0)  # Escribe un cero en la posición del disco que se acaba de mover en la torre origen
+    lw t1, 0(t0)   # Carga el valor del disco en la direcciï¿½n calculada (t0), y guarda el valor en t1
+    sw zero, 0(t0)  # Escribe un cero en la posiciï¿½n del disco que se acaba de mover en la torre origen
     sw t1, 0(s3)  # Escribe el valor del disco en la cima de la torre destino (s3)
-    jalr ra      
+    jal zero, endmov      
     
 
 endcode: nop
